@@ -1,7 +1,5 @@
 from pathlib import Path
 from datetime import timedelta
-# import django_heroku
-# import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -53,7 +51,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
 
     'account.apps.AccountConfigCore',
-    'travel_tours.apps.TravelToursConfig'
+    'travel_tours.apps.TravelToursConfig',
+    'travel_tours_info.apps.TravelToursInfoConfig',
 
 ]
 
@@ -74,6 +73,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -89,8 +89,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                # Social Auth
                 'social_django.context_processors.backends',
-                'social_django.context_processors.login_redirect',
+                'social_django.context_processors.login_redirect'
             ],
         },
     },
@@ -155,11 +156,9 @@ DJOSER = {
     'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
     'ACTIVATION_URL': '#/activate/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': True,
-    'SERIALIZERS': {
-
-    },
+    'SERIALIZERS': {},
     'SOCIAL_AUTH_TOKEN_STRATEGY': 'djoser.social.token.jwt.TokenStrategy',
-    'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': ['http://localhost:8000/',],
+    'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': ['http://localhost:8000', ],
 }
 
 AUTH_USER_MODEL = 'account.CustomUser'
@@ -195,20 +194,19 @@ AUTHENTICATION_BACKENDS = (
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
     'https://www.googleapis.com/auth/userinfo.email',
-    'https://www.googleapis.com/auth/userinfo.profile',
+    # 'https://www.googleapis.com/auth/userinfo.profile',
 ]
 
 SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ('JWT', 'Bearer'),
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    # 'AUTH_TOKEN_CLASSES': 'rest_framework_simplejwt.token.AccessToken'
 }
 
-# django_heroku.settings(locals())
-
 STORAGES = {
-    # ...
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
